@@ -788,6 +788,135 @@
         </p>
       </div>
 
+      <!-- PICTORIAL FLOW: 4-STEP PRODUCTION CAG LIFECYCLE -->
+      <div class="mb-12 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 md:p-8 shadow-xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+          <div>
+            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Pictorial System Architecture</span>
+            <h4 class="text-lg font-bold text-white mt-0.5">End-to-End Production Lifecycle Flow</h4>
+          </div>
+          <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">Zero Vector DB</span>
+        </div>
+
+        <!-- 4-Step Pictorial Flow Nodes -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
+          <!-- Step 1 -->
+          <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 flex flex-col justify-between space-y-3 relative group hover:border-indigo-500/50 transition-all">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 font-bold text-xs flex items-center justify-center">1</span>
+                <span class="text-[10px] text-slate-500 font-mono">CI/CD / Release</span>
+              </div>
+              <h5 class="text-xs font-bold text-white mt-3">Corpus Ingestion & SHA-256 Hashing</h5>
+              <p class="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+                Raw files, PDFs, or API code are parsed into a single standardized text corpus. A deterministic cryptographic hash is computed.
+              </p>
+            </div>
+            <div class="p-2 rounded bg-slate-900 text-[10px] text-indigo-300 font-mono border border-slate-800">
+              hash = sha256(docs)
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="p-4 rounded-xl bg-slate-950 border border-indigo-500/40 flex flex-col justify-between space-y-3 relative group hover:border-indigo-500 transition-all">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="w-7 h-7 rounded-lg bg-indigo-500 text-white font-bold text-xs flex items-center justify-center">2</span>
+                <span class="text-[10px] text-emerald-400 font-mono">One-Time Warmup</span>
+              </div>
+              <h5 class="text-xs font-bold text-white mt-3">KV Attention Pre-Warming</h5>
+              <p class="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+                SDK pre-fills all 1M+ tokens into the foundation model. Multi-head Key-Value attention states freeze directly inside GPU HBM memory.
+              </p>
+            </div>
+            <div class="p-2 rounded bg-slate-900 text-[10px] text-emerald-400 font-mono border border-slate-800">
+              cache = create(ttl=2h)
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 flex flex-col justify-between space-y-3 relative group hover:border-purple-500/50 transition-all">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-400 font-bold text-xs flex items-center justify-center">3</span>
+                <span class="text-[10px] text-slate-500 font-mono">Registry Store</span>
+              </div>
+              <h5 class="text-xs font-bold text-white mt-3">Atomic Cache Registry</h5>
+              <p class="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+                The returned cache handle (e.g. <code>cag-kv-f2dcc...</code>) is registered in Redis / ConfigMap with sliding TTL expiration keep-alives.
+              </p>
+            </div>
+            <div class="p-2 rounded bg-slate-900 text-[10px] text-purple-300 font-mono border border-slate-800">
+              redis.set(active_key)
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="p-4 rounded-xl bg-slate-950 border border-emerald-500/40 flex flex-col justify-between space-y-3 relative group hover:border-emerald-500 transition-all">
+            <div>
+              <div class="flex items-center justify-between">
+                <span class="w-7 h-7 rounded-lg bg-emerald-500 text-slate-950 font-bold text-xs flex items-center justify-center">4</span>
+                <span class="text-[10px] text-emerald-300 font-mono">Sub-50ms Serving</span>
+              </div>
+              <h5 class="text-xs font-bold text-white mt-3">Direct Attention Serving</h5>
+              <p class="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+                Client API calls pass <code>cache_id + prompt</code>. LLM skips prefill computation and emits response instantly with 75% cost discount!
+              </p>
+            </div>
+            <div class="p-2 rounded bg-slate-900 text-[10px] text-emerald-300 font-mono border border-slate-800">
+              generate(cache=name)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DETAILED 4 PRODUCTION IMPLEMENTATION STEPS (TEXT EXPLANATION) -->
+      <div class="mb-12 bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8">
+        <h4 class="text-base font-bold text-white mb-6">4 Steps to Implement CAG in Your Enterprise Stack:</h4>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-300">
+          <div class="space-y-2">
+            <h5 class="font-bold text-indigo-400 flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-[10px]">1</span>
+              Step 1: Document Aggregation & Hash Fingerprinting
+            </h5>
+            <p class="text-slate-400 leading-relaxed pl-7">
+              Concatenate your domain documents (SDK manuals, credit policy PDFs, KYC laws) into a single structured string prefix. Compute a SHA-256 fingerprint. If the fingerprint matches your active cache, you skip re-warming entirely.
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            <h5 class="font-bold text-indigo-400 flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-[10px]">2</span>
+              Step 2: Trigger Async Cache Warming via SDK
+            </h5>
+            <p class="text-slate-400 leading-relaxed pl-7">
+              Issue a <code>client.cached_contents.create(...)</code> API call. Set an explicit Time-To-Live (e.g. 2 hours or 24 hours). The model processes the tokens once and returns a persistent cache handle name.
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            <h5 class="font-bold text-indigo-400 flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-[10px]">3</span>
+              Step 3: Atomic Switch & CI/CD Pipeline Integration
+            </h5>
+            <p class="text-slate-400 leading-relaxed pl-7">
+              Store the new active handle in your application registry (Redis, Consul, or environment variable). Because the cache is already warm in memory before live traffic routes to it, users experience zero cold-start latency.
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            <h5 class="font-bold text-indigo-400 flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-[10px]">4</span>
+              Step 4: Query Routing with Automatic Fallback
+            </h5>
+            <p class="text-slate-400 leading-relaxed pl-7">
+              Route user queries with <code>cached_content=active_cache.name</code>. If the cache expires or drops, configure graceful fallback to dynamic uncached context prefill while an asynchronous worker warms a fresh cache in the background.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <!-- Live Code & Output Dual Pane -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
         
