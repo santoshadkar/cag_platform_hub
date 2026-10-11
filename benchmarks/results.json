@@ -1,0 +1,15 @@
+{
+  "metrics": {
+    "workload_queries": 30,
+    "codebase_tokens": 93870,
+    "cag_p50_latency_ms": 58.45,
+    "cag_p95_latency_ms": 60.8,
+    "rag_p50_latency_ms": 440.91,
+    "rag_p95_latency_ms": 441.53,
+    "latency_reduction_pct": 86.74,
+    "cag_total_cost_usd": 2.7105,
+    "uncached_full_context_cost_usd": 9.8564,
+    "cost_reduction_vs_uncached_pct": 72.5,
+    "context_accuracy_retention": "100% (No chunk fragmentation or loss)"
+  }
+}

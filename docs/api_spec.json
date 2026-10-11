@@ -1,0 +1,167 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "CAG Developer Copilot API",
+    "description": "Cache-Augmented Generation (CAG) API for instant code & documentation question answering using pre-computed KV context caching.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local Development Server"
+    }
+  ],
+  "paths": {
+    "/api/v1/cache/warm": {
+      "post": {
+        "summary": "Preload and warm KV cache for a repository / SDK documentation set",
+        "operationId": "warmCache",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CacheWarmRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cache warmed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CacheWarmResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid payload or context threshold exceeded"
+          }
+        }
+      }
+    },
+    "/api/v1/query": {
+      "post": {
+        "summary": "Execute query against pre-cached codebase context",
+        "operationId": "queryCodebase",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Query answered successfully with cache metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cache/stats": {
+      "get": {
+        "summary": "Retrieve telemetry, hit rates, and latency savings",
+        "operationId": "getCacheStats",
+        "responses": {
+          "200": {
+            "description": "Operational cache statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CacheStatsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CacheWarmRequest": {
+        "type": "object",
+        "required": ["repo_id", "documents"],
+        "properties": {
+          "repo_id": {
+            "type": "string",
+            "example": "enterprise-sdk-core"
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": { "type": "string" },
+                "content": { "type": "string" }
+              },
+              "required": ["path", "content"]
+            }
+          },
+          "ttl_seconds": {
+            "type": "integer",
+            "default": 3600
+          }
+        }
+      },
+      "CacheWarmResponse": {
+        "type": "object",
+        "properties": {
+          "cache_id": { "type": "string" },
+          "repo_id": { "type": "string" },
+          "cached_tokens": { "type": "integer" },
+          "expires_at": { "type": "string", "format": "date-time" },
+          "status": { "type": "string", "example": "ACTIVE" }
+        }
+      },
+      "QueryRequest": {
+        "type": "object",
+        "required": ["cache_id", "prompt"],
+        "properties": {
+          "cache_id": { "type": "string" },
+          "prompt": { "type": "string" },
+          "temperature": { "type": "number", "default": 0.2 }
+        }
+      },
+      "QueryResponse": {
+        "type": "object",
+        "properties": {
+          "answer": { "type": "string" },
+          "cache_hit": { "type": "boolean" },
+          "tokens_cached": { "type": "integer" },
+          "tokens_generated": { "type": "integer" },
+          "latency_ms": { "type": "number" },
+          "cost_savings_pct": { "type": "number" },
+          "citations": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "CacheStatsResponse": {
+        "type": "object",
+        "properties": {
+          "active_caches": { "type": "integer" },
+          "total_queries": { "type": "integer" },
+          "cache_hit_rate": { "type": "number" },
+          "avg_latency_cag_ms": { "type": "number" },
+          "avg_latency_rag_ms": { "type": "number" },
+          "estimated_dollars_saved": { "type": "number" }
+        }
+      }
+    }
+  }
+}
